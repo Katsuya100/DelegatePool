@@ -154,7 +154,7 @@ finally
 }
 ```
 
-`ReadOnlyHandler`型にキャストすれば、Handlerをメンバで保持することが可能です。  
+また、`ReadOnlyHandler`型にキャストすれば、Handlerをメンバで保持することが可能です。  
 
 ```.cs
 private DelegatePool<Action>.ReadOnlyHandler _handle;
