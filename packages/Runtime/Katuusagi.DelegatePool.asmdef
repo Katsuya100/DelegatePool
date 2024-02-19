@@ -1,0 +1,17 @@
+{
+    "name": "Katuusagi.DelegatePool",
+    "rootNamespace": "Katuusagi.Pool",
+    "references": [
+        "GUID:8593f1840fca4844c9db673d969a69db",
+        "GUID:24beb62ab04e51240abd266bbebe6576"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,26 @@
+{
+    "name": "com.katuusagi.delegatepool",
+    "displayName": "DelegatePool",
+    "description": "Can implement a pool to cache instances of Delegate and lambda expressions.",
+    "version": "1.0.0",
+    "unity": "2021.3",
+    "dependencies": {
+        "com.unity.test-framework": "1.1.31",
+        "com.unity.test-framework.performance": "3.0.2",
+        "com.katuusagi.boxingpool": "1.3.0",
+        "com.katuusagi.ilpostprocessorcommon": "2.2.0",
+        "com.katuusagi.memoizationforunity": "1.4.2"
+    },
+    "keywords": [
+        "delegate",
+        "allocation",
+        "memory",
+        "optimize"
+    ],
+    "author": {
+        "name": "Katuusagi a.k.a Katsuya100"
+    },
+    "documentationUrl": "https://github.com/Katsuya100/DelegatePool",
+    "changelogUrl": "https://github.com/Katsuya100/DelegatePool/releases",
+    "licensesUrl": "https://github.com/Katsuya100/DelegatePool/blob/v1.0.0/LICENSE"
+}

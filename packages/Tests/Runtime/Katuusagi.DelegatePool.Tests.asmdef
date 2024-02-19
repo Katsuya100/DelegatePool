@@ -1,0 +1,20 @@
+{
+    "name": "Katuusagi.DelegatePool.Tests",
+    "rootNamespace": "Katuusagi.DelegatePool.Tests",
+    "references": [
+        "GUID:cdd2de3397f7a0b478af3113645e815c",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:c0dd0d10738d4ad4a9de57c559d0ca1b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
