@@ -104,9 +104,9 @@ IL2CPP環境で5倍程度の性能改善が見られます。
 ### 依存パッケージをインストール
 以下のパッケージをインストールする。  
 
-- [ILPostProcessorCommon v2.2.0](https://github.com/Katsuya100/ILPostProcessorCommon/tree/v2.2.0)
-- [BoxingPool v1.3.0](https://github.com/Katsuya100/BoxingPool/tree/v1.3.0)
-- [MemoizationForUnity v1.4.2](https://github.com/Katsuya100/MemoizationForUnity/tree/v1.4.2)
+- [ILPostProcessorCommon v2.3.0](https://github.com/Katsuya100/ILPostProcessorCommon/tree/ver2.3.0)
+- [BoxingPool v1.3.1](https://github.com/Katsuya100/BoxingPool/tree/ver1.3.1)
+- [MemoizationForUnity v1.5.0](https://github.com/Katsuya100/MemoizationForUnity/tree/ver1.5.0)
 
 ### DelegatePoolのインストール
 1. [Window > Package Manager]を開く。
