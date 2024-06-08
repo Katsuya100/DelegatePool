@@ -106,9 +106,9 @@ Memory performance is also eco-friendly because allocations can be suppressed.
 ### Install dependenies
 Install the following packages.  
 
-- [ILPostProcessorCommon v2.2.0](https://github.com/Katsuya100/ILPostProcessorCommon/tree/v2.2.0)
-- [BoxingPool v1.3.0](https://github.com/Katsuya100/BoxingPool/tree/v1.3.0)
-- [MemoizationForUnity v1.4.2](https://github.com/Katsuya100/MemoizationForUnity/tree/v1.4.2)
+- [ILPostProcessorCommon v2.3.0](https://github.com/Katsuya100/ILPostProcessorCommon/tree/ver2.3.0)
+- [BoxingPool v1.3.1](https://github.com/Katsuya100/BoxingPool/tree/ver1.3.1)
+- [MemoizationForUnity v1.5.0](https://github.com/Katsuya100/MemoizationForUnity/tree/ver1.5.0)
 
 ### Installing DelegatePool
 1. Open [Window > Package Manager].
