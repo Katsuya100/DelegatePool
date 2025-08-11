@@ -5,7 +5,6 @@ using Mono.Cecil.Rocks;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 
@@ -80,24 +79,14 @@ namespace Katuusagi.Pool.Editor
                         }
                     }
 
-                    var pe  = new MemoryStream();
-                    var pdb = new MemoryStream();
-                    var writeParameter = new WriterParameters
-                    {
-                        SymbolWriterProvider = new PortablePdbWriterProvider(),
-                        SymbolStream         = pdb,
-                        WriteSymbols         = true
-                    };
-
-                    assembly.Write(pe, writeParameter);
-                    return new ILPostProcessResult(new InMemoryAssembly(pe.ToArray(), pdb.ToArray()), ILPPUtils.Logger.Messages);
+                    return compiledAssembly.GetResult(assembly);
                 }
             }
             catch (Exception e)
             {
                 ILPPUtils.LogException(e);
             }
-            return new ILPostProcessResult(null, ILPPUtils.Logger.Messages);
+            return compiledAssembly.GetNullResult();
         }
 
         private bool DelegatePoolProcess(MethodBody body, MethodDefinition method, Instruction instruction, ref int diff)
@@ -115,7 +104,7 @@ namespace Katuusagi.Pool.Editor
             _delegatePoolModule = getRef.DeclaringType.Module;
             _delegatePoolScope = getRef.DeclaringType.Scope;
 
-            instruction.TryGetPushArgumentInstruction(0, out var newObj);
+            instruction.TryGetPushArgumentInstruction(method, 0, out var newObj);
             bool isCacheGenerated = false;
             if (newObj.OpCode == OpCodes.Dup)
             {
@@ -175,7 +164,7 @@ namespace Katuusagi.Pool.Editor
 
             if (isCacheGenerated)
             {
-                instruction.TryGetPushArgumentInstruction(1, out var ldloca);
+                instruction.TryGetPushArgumentInstruction(method, 1, out var ldloca);
                 var seek = ldftn.GetPrev();
                 while (seek != null)
                 {
@@ -297,7 +286,7 @@ namespace Katuusagi.Pool.Editor
                 return true;
             }
 
-            instruction.TryGetPushArgumentInstruction(0, out var box);
+            instruction.TryGetPushArgumentInstruction(method, 0, out var box);
             if (box.OpCode != OpCodes.Box)
             {
                 ILPPUtils.LogError("DELEGATEPOOL499", "DelegatePool failed.", "Unknown implementation.", method, instruction);
@@ -323,9 +312,10 @@ namespace Katuusagi.Pool.Editor
                 return true;
             }
 
-            var ldlocVar = ILPPUtils.GetVariableFromLdloc(target, body);
-            if (ldlocVar != null)
+            var localIndex = ILPPUtils.GetLoadLocalIndex(target);
+            if (localIndex >= 0)
             {
+                var ldlocVar = body.Variables[localIndex];
                 box.OpCode = OpCodes.Nop;
                 box.Operand = null;
 
@@ -335,9 +325,10 @@ namespace Katuusagi.Pool.Editor
                 return true;
             }
 
-            var ldargParam = ILPPUtils.GetArgumentFromLdarg(target, method);
-            if (ldargParam != null)
+            var argIndex = ILPPUtils.GetLoadArgumentIndex(target);
+            if (argIndex >= 0)
             {
+                var ldargParam = method.Parameters[argIndex];
                 box.OpCode = OpCodes.Nop;
                 box.Operand = null;
 
@@ -382,15 +373,16 @@ namespace Katuusagi.Pool.Editor
             }
             else
             {
-                lambdaInstanceVar = ILPPUtils.GetVariableFromStloc(stloc, body);
-                if (lambdaInstanceVar == null)
+                var localIndex = ILPPUtils.GetSetLocalIndex(stloc);
+                if (localIndex < 0)
                 {
                     ILPPUtils.LogWarning("DELEGATEPOOL599", "DelegatePool failed.", "Unknown lambda implementation.", method, gets.FirstOrDefault());
                     return;
                 }
 
+                lambdaInstanceVar = body.Variables[localIndex];
                 var ldlocs = FindLdlocs(body, lambdaInstanceVar).ToArray();
-                var isPoolable = ldlocs.All(v => IsAllowedDelegatePoolLdloc(v, lambdaInstanceTypeRef));
+                var isPoolable = ldlocs.All(v => IsAllowedDelegatePoolLdloc(method, v, lambdaInstanceTypeRef));
                 if (!isPoolable)
                 {
                     return;
@@ -412,7 +404,7 @@ namespace Katuusagi.Pool.Editor
 
             foreach (var get in gets)
             {
-                get.TryGetPushArgumentInstruction(2, out var ldHandlerVar);
+                get.TryGetPushArgumentInstruction(method, 2, out var ldHandlerVar);
                 var ldHandlerTmp = ILPPUtils.LoadLocal(handlerVar);
                 ldHandlerVar.OpCode = ldHandlerTmp.OpCode;
                 ldHandlerVar.Operand = ldHandlerTmp.Operand;
@@ -573,27 +565,27 @@ namespace Katuusagi.Pool.Editor
             for (int i = 0; i < instructions.Count; ++i)
             {
                 var instruction = instructions[i];
-                var cmp = ILPPUtils.GetVariableFromLdloc(instruction, body);
-                if (variable == cmp)
+                var cmpIdx = ILPPUtils.GetLoadLocalIndex(instruction);
+                if (variable.Index == cmpIdx)
                 {
                     yield return instruction;
                 }
             }
         }
 
-        private bool IsAllowedDelegatePoolLdloc(Instruction instruction, TypeReference lambdaInstanceType)
+        private bool IsAllowedDelegatePoolLdloc(MethodReference method, Instruction instruction, TypeReference lambdaInstanceType)
         {
-            var result = IsValueOfStfld(lambdaInstanceType, instruction) ||
-                         IsValueOfLdfld(lambdaInstanceType, instruction) ||
-                         IsArgumentOfDelegatePoolGet(0, instruction);
+            var result = IsValueOfStfld(method, lambdaInstanceType, instruction) ||
+                         IsValueOfLdfld(method, lambdaInstanceType, instruction) ||
+                         IsArgumentOfDelegatePoolGet(method, 0, instruction);
             return result;
         }
 
-        private bool IsValueOfStfld(TypeReference declaringType, Instruction instruction)
+        private bool IsValueOfStfld(MethodReference method, TypeReference declaringType, Instruction instruction)
         {
             var stfld = FindStfld(instruction, declaringType);
             if (stfld == null ||
-                !stfld.TryGetStackPushedInstruction(-2, out var pushedValue))
+                !stfld.TryGetStackPushedInstruction(method, -2, out var pushedValue))
             {
                 return false;
             }
@@ -601,11 +593,11 @@ namespace Katuusagi.Pool.Editor
             return pushedValue == instruction;
         }
 
-        private bool IsValueOfLdfld(TypeReference declaringType, Instruction instruction)
+        private bool IsValueOfLdfld(MethodReference method, TypeReference declaringType, Instruction instruction)
         {
             var ldfld = FindLdfld(instruction, declaringType);
             if (ldfld == null ||
-                !ldfld.TryGetStackPushedInstruction(-1, out var pushedValue))
+                !ldfld.TryGetStackPushedInstruction(method, -1, out var pushedValue))
             {
                 return false;
             }
@@ -613,11 +605,11 @@ namespace Katuusagi.Pool.Editor
             return pushedValue == instruction;
         }
 
-        private bool IsArgumentOfDelegatePoolGet(int argNumber, Instruction instruction)
+        private bool IsArgumentOfDelegatePoolGet(MethodReference method, int argNumber, Instruction instruction)
         {
             var call = FindDelegatePoolGetClassOnly(instruction);
             if (call == null ||
-                !call.TryGetPushArgumentInstruction(argNumber, out var arg))
+                !call.TryGetPushArgumentInstruction(method, argNumber, out var arg))
             {
                 return false;
             }

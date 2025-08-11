@@ -2,6 +2,7 @@ using Katuusagi.Pool.Utils;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace Katuusagi.Pool
 {
@@ -33,6 +34,13 @@ namespace Katuusagi.Pool
                 {
                     _lambda.Release();
                 }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public Awaitable DisposeAsync()
+            {
+                Dispose();
+                return AwaitableUtils.Completed;
             }
         }
 
@@ -74,6 +82,15 @@ namespace Katuusagi.Pool
         }
 
         private static Stack<T> _stack = new Stack<T>(32);
+
+        public static void Warmup(T dummy, int count)
+        {
+            for (int i = _stack.Count; i < count; ++i)
+            {
+                var del = (T)Delegate.CreateDelegate(typeof(T), dummy.Target, dummy.Method);
+                TryReturn(del);
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static GetHandler Get(T del, out T result)
