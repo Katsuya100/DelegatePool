@@ -14,23 +14,6 @@ namespace Katuusagi.Pool.Tests
         }
 
         [Test]
-        public void Warmup()
-        {
-            {
-                var t = new TestFunctions.Test();
-                DelegatePool<Func<int>>.Warmup(t.Return1, 8);
-            }
-            {
-                var t = new TestFunctions.Test();
-                ConcurrentDelegatePool<Func<int>>.Warmup(t.Return1, 8);
-            }
-            {
-                var t = new TestFunctions.Test();
-                ThreadStaticDelegatePool<Func<int>>.Warmup(t.Return1, 8);
-            }
-        }
-
-        [Test]
         public void Instance()
         {
             {
