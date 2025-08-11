@@ -7,7 +7,7 @@ Delegateオブジェクトを事前にPoolしておき、必要なときに再�
 ## 動作確認環境
 |  環境  |  バージョン  |
 | ---- | ---- |
-| Unity | 2021.3.38f1, 2022.3.20f1 |
+| Unity | 6000.0.51f1 |
 | .Net | 4.x, Standard 2.1 |
 
 ## 性能
@@ -104,7 +104,7 @@ IL2CPP環境で5倍程度の性能改善が見られます。
 ### 依存パッケージをインストール
 以下のパッケージをインストールする。  
 
-- [ILPostProcessorCommon v2.3.0](https://github.com/Katsuya100/ILPostProcessorCommon/tree/ver2.3.0)
+- [ILPostProcessorCommon v2.3.0](https://github.com/Katsuya100/ILPostProcessorCommon/tree/ver2.4.1)
 - [BoxingPool v1.3.1](https://github.com/Katsuya100/BoxingPool/tree/ver1.3.1)
 - [MemoizationForUnity v1.5.0](https://github.com/Katsuya100/MemoizationForUnity/tree/ver1.5.0)
 
