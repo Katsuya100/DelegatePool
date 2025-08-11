@@ -125,7 +125,7 @@ Download the appropriate version of `Katuusagi.DelegatePool.unitypackage` from [
 ## How to Use
 ### Normal usage
 DelegatePool can be used with the following notation.  
-If you do not use the using statement, performance may be degraded due to release leaks.  
+If you do not use the using statement(or await using statement), performance may be degraded due to release leaks.  
 ```.cs
 public static void Hoge()
 {
